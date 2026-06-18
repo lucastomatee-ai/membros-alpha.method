@@ -1,592 +1,671 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Método Alpha - Área de Membros</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: #0a0a0a; 
-            color: #fff; 
-            overflow-x: hidden;
-        }
-        .glass { 
-            background: rgba(20, 20, 20, 0.6); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(239, 68, 68, 0.1); 
-        }
-        .shimmer {
-            background: linear-gradient(90deg, #ef4444 0%, #dc2626 50%, #ef4444 100%);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        /* Notification animations */
-        .notification-enter { animation: slideInRight 0.4s ease-out; }
-        .notification-exit { animation: slideOutRight 0.4s ease-in forwards; }
-        @keyframes slideInRight {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOutRight {
-            to { transform: translateX(400px); opacity: 0; }
-        }
-        
-        /* Modal animations */
-        .modal-backdrop {
-            animation: fadeIn 0.3s ease-out;
-        }
-        .modal-content {
-            animation: scaleIn 0.3s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        /* Sidebar sticky */
-        .sidebar-sticky {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 40;
-            animation: slideInFromRight 0.5s ease-out;
-        }
-        @keyframes slideInFromRight {
-            from { transform: translate(300px, -50%); opacity: 0; }
-            to { transform: translate(0, -50%); opacity: 1; }
-        }
-        
-        /* Pulse animation */
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .pulse-slow {
-            animation: pulse 3s ease-in-out infinite;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Método Alpha — Área de Membros</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    :root {
+      --bg:      #09090B;
+      --s1:      #18181B;
+      --s2:      #27272A;
+      --red:     #EF4444;
+      --red-dk:  #B91C1C;
+      --text:    #F4F4F5;
+      --muted:   #71717A;
+      --sub:     #A1A1AA;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(9,9,11,.92);
+      border-bottom: 1px solid var(--s2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .nav-inner {
+      max-width: 900px; margin: 0 auto;
+      padding: 0 20px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-icon {
+      width: 34px; height: 34px;
+      background: var(--red);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-logo-text {
+      font-size: .9rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .nav-logo-text span { color: var(--red); }
+    .nav-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,.08);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: 99px; padding: 5px 12px;
+    }
+    .nav-badge-dot {
+      width: 6px; height: 6px;
+      background: #22c55e; border-radius: 50%;
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    @keyframes badgePulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .nav-badge-text {
+      font-size: .65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: #22c55e;
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page {
+      max-width: 900px; margin: 0 auto;
+      padding: 88px 20px 60px;
+      display: flex; flex-direction: column; gap: 48px;
+    }
+
+    /* ── WELCOME HEADER ── */
+    .welcome-eyebrow {
+      font-size: .65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--red); margin-bottom: 8px;
+    }
+    .welcome-title {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -.03em;
+    }
+    .welcome-title em { font-style: normal; color: var(--red); }
+    .welcome-sub {
+      font-size: .9rem; color: var(--sub);
+      line-height: 1.6; margin-top: 10px;
+      max-width: 520px;
+    }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .stat-card {
+      background: var(--s1);
+      border: 1px solid var(--s2);
+      border-radius: 12px; padding: 16px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.6rem; font-weight: 900;
+      line-height: 1; letter-spacing: -.02em;
+    }
+    .stat-label {
+      font-size: .62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-top: 4px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .sec-label {
+      font-size: .65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--muted); margin-bottom: 16px;
+    }
+
+    /* ── HERO PDF CARD (signature element) ── */
+    .pdf-hero {
+      position: relative;
+      background: var(--s1);
+      border: 1px solid var(--s2);
+      border-radius: 20px;
+      padding: 28px 24px;
+      overflow: hidden;
+    }
+    /* stacked pages shadow effect */
+    .pdf-hero::before,
+    .pdf-hero::after {
+      content: '';
+      position: absolute;
+      left: 10px; right: 10px; bottom: -6px;
+      height: 100%; background: var(--s2);
+      border-radius: 20px; z-index: -1;
+    }
+    .pdf-hero::after {
+      left: 20px; right: 20px; bottom: -12px;
+      background: #1f1f22; z-index: -2;
+    }
+    /* top accent line */
+    .pdf-hero-accent {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--red-dk), var(--red), #f87171);
+    }
+    .pdf-hero-inner {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    @media (min-width: 560px) {
+      .pdf-hero-inner { flex-direction: row; align-items: center; }
+    }
+    .pdf-icon-wrap {
+      flex-shrink: 0;
+      width: 80px; height: 100px;
+      background: linear-gradient(160deg, #1c1c1f 0%, #141416 100%);
+      border: 1px solid var(--s2);
+      border-radius: 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px;
+      position: relative;
+    }
+    .pdf-icon-wrap::after {
+      content: '';
+      position: absolute; top: 0; right: 0;
+      width: 20px; height: 20px;
+      background: var(--bg);
+      border-bottom-left-radius: 8px;
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+    .pdf-icon-text {
+      font-size: .6rem; font-weight: 900;
+      letter-spacing: .08em; color: var(--red);
+      text-transform: uppercase;
+    }
+    .pdf-icon-lines {
+      display: flex; flex-direction: column; gap: 3px;
+      width: 40px;
+    }
+    .pdf-icon-lines span {
+      display: block; height: 2px; border-radius: 99px;
+      background: var(--s2);
+    }
+    .pdf-icon-lines span:first-child { width: 100%; }
+    .pdf-icon-lines span:nth-child(2) { width: 80%; }
+    .pdf-icon-lines span:nth-child(3) { width: 90%; }
+    .pdf-icon-lines span:nth-child(4) { width: 60%; }
+
+    .pdf-info { flex: 1; }
+    .pdf-badge-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .pdf-badge-main {
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.3);
+      color: var(--red);
+      font-size: .6rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: .1em;
+      padding: 3px 10px; border-radius: 99px;
+      animation: mainBadge 2s ease-in-out 1;
+    }
+    @keyframes mainBadge {
+      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
+      50%  { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    .pdf-badge-format {
+      background: var(--s2);
+      color: var(--muted);
+      font-size: .6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 3px 9px; border-radius: 99px;
+    }
+    .pdf-title {
+      font-size: 1.2rem; font-weight: 900;
+      line-height: 1.2; letter-spacing: -.02em; margin-bottom: 6px;
+    }
+    .pdf-desc {
+      font-size: .8rem; color: var(--sub);
+      line-height: 1.6; margin-bottom: 16px;
+    }
+    .pdf-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--red);
+      color: #fff; font-weight: 800;
+      font-size: .82rem; text-transform: uppercase;
+      letter-spacing: .04em; border-radius: 10px;
+      padding: 12px 20px; border: none; cursor: pointer;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pdf-btn:hover { background: #DC2626; }
+    .pdf-btn:active { transform: scale(.97); }
+    .pdf-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ── BONUS GRID ── */
+    .bonus-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 560px) {
+      .bonus-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .bonus-card {
+      background: var(--s1);
+      border: 1px solid var(--s2);
+      border-radius: 14px; padding: 18px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: border-color .2s, transform .15s;
+      cursor: default;
+    }
+    .bonus-card:hover {
+      border-color: #3f3f46;
+      transform: translateY(-2px);
+    }
+    .bonus-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 8px;
+    }
+    .bonus-icon { font-size: 1.6rem; line-height: 1; }
+    .bonus-count-badge {
+      font-size: .6rem; font-weight: 700;
+      color: var(--muted); background: var(--s2);
+      border-radius: 6px; padding: 3px 8px; white-space: nowrap;
+    }
+    .bonus-title {
+      font-size: .9rem; font-weight: 800;
+      line-height: 1.3; margin-bottom: 4px;
+    }
+    .bonus-desc {
+      font-size: .75rem; color: var(--muted); line-height: 1.55;
+    }
+    .bonus-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: transparent;
+      border: 1px solid var(--s2);
+      border-radius: 8px; padding: 9px;
+      color: var(--sub); font-size: .75rem; font-weight: 700;
+      text-decoration: none; text-transform: uppercase; letter-spacing: .04em;
+      transition: background .15s, border-color .15s, color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bonus-btn:hover {
+      background: rgba(255,255,255,.04);
+      border-color: #52525b; color: var(--text);
+    }
+    .bonus-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── UPSELL CARD (single, between sections) ── */
+    .upsell-card {
+      background: var(--s1);
+      border: 1px solid rgba(245,158,11,.2);
+      border-radius: 16px; padding: 24px;
+      position: relative; overflow: hidden;
+    }
+    .upsell-card-top {
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #F59E0B, transparent);
+    }
+    .upsell-inner {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    @media (min-width: 640px) {
+      .upsell-inner { flex-direction: row; align-items: center; }
+    }
+    .upsell-text { flex: 1; }
+    .upsell-eyebrow {
+      font-size: .62rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: #F59E0B; margin-bottom: 6px;
+    }
+    .upsell-title {
+      font-size: 1rem; font-weight: 900;
+      line-height: 1.3; margin-bottom: 6px;
+    }
+    .upsell-desc {
+      font-size: .78rem; color: var(--sub); line-height: 1.6;
+    }
+    .upsell-cta {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #F59E0B; color: #000;
+      font-weight: 900; font-size: .78rem;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-radius: 10px; padding: 12px 20px;
+      text-decoration: none;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .upsell-cta:hover { background: #FBBF24; }
+
+    /* ── PROGRESS COMPLETE BANNER ── */
+    .complete-banner {
+      background: rgba(34,197,94,.06);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: 14px; padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .complete-banner-icon { font-size: 2rem; flex-shrink: 0; }
+    .complete-banner-title { font-size: .9rem; font-weight: 800; margin-bottom: 4px; }
+    .complete-banner-text { font-size: .78rem; color: var(--sub); line-height: 1.5; }
+
+    /* ── NOTIFICATION TOAST ── */
+    #toast-container {
+      position: fixed; bottom: 24px; right: 20px;
+      z-index: 100; display: flex; flex-direction: column;
+      gap: 10px; max-width: 300px;
+    }
+    .toast {
+      background: var(--s1); border: 1px solid var(--s2);
+      border-radius: 12px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      animation: toastIn .3s ease-out both;
+    }
+    .toast.out { animation: toastOut .3s ease-in forwards; }
+    @keyframes toastIn  { from { transform: translateX(120%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+    @keyframes toastOut { to   { transform: translateX(120%); opacity:0; } }
+    .toast-icon { font-size: 1rem; flex-shrink: 0; }
+    .toast-text { font-size: .75rem; font-weight: 600; color: var(--sub); line-height: 1.4; }
+    .toast-text b { color: var(--text); }
+
+    /* ── MODULE COMPLETE MODAL ── */
+    .modal-wrap {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.8); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-wrap.open { display: flex; }
+    .modal-box {
+      background: var(--s1); border: 1px solid var(--s2);
+      border-radius: 20px; padding: 32px 24px;
+      max-width: 360px; width: 100%; text-align: center;
+      animation: modalIn .3s cubic-bezier(.34,1.4,.64,1) both;
+    }
+    @keyframes modalIn { from { transform: scale(.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .modal-emoji { font-size: 3rem; margin-bottom: 12px; }
+    .modal-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; }
+    .modal-text { font-size: .82rem; color: var(--sub); line-height: 1.6; margin-bottom: 20px; }
+    .modal-close {
+      display: block; width: 100%; background: var(--s2); border: none;
+      border-radius: 10px; padding: 12px; color: var(--sub);
+      font-size: .78rem; font-weight: 700; font-family: inherit; cursor: pointer;
+    }
+    .modal-close:hover { background: #3f3f46; color: var(--text); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-badge-dot, .pdf-badge-main, .toast, .toast.out, .modal-box { animation: none; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Header -->
-    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-red-600 to-red-400 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xl font-black uppercase tracking-tight">
-                        Método <span class="shimmer">Alpha</span>
-                    </span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="text-xs font-bold text-green-500">MEMBRO ATIVO</span>
-                    </div>
-                    <button class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
         </div>
-    </nav>
+        <span class="nav-logo-text">Método <span>Alpha</span></span>
+      </div>
+      <div class="nav-badge">
+        <div class="nav-badge-dot"></div>
+        <span class="nav-badge-text">Membro Ativo</span>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Hero Stats -->
-    <section class="pt-32 pb-16 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight mb-4">
-                    Bem-vindo ao <span class="shimmer">Alpha</span>
-                </h1>
-                <p class="text-zinc-400 text-lg">Seu progresso rumo à dominância masculina</p>
-            </div>
+  <main class="page">
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-3xl font-black text-red-500 mb-2" id="completion-percent">0%</div>
-                    <div class="text-xs text-zinc-500 uppercase font-bold">Conclusão</div>
-                </div>
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-3xl font-black text-white mb-2" id="modules-completed">0/6</div>
-                    <div class="text-xs text-zinc-500 uppercase font-bold">Módulos</div>
-                </div>
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-3xl font-black text-green-500 mb-2" id="streak-days">0</div>
-                    <div class="text-xs text-zinc-500 uppercase font-bold">Dias Seguidos</div>
-                </div>
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-3xl font-black text-amber-500 mb-2" id="total-medals">0</div>
-                    <div class="text-xs text-zinc-500 uppercase font-bold">Conquistas</div>
-                </div>
-            </div>
-
-            <!-- Módulos -->
-            <div class="mb-12">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-black uppercase">Seu Arsenal</h2>
-                    <button onclick="resetProgress()" class="text-xs text-zinc-500 hover:text-red-500 transition-colors">Resetar Progresso</button>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modules-grid">
-                    <!-- Modules will be inserted here by JavaScript -->
-                </div>
-            </div>
-
-            <!-- UPSELL #4: CARD ENTRE MÓDULOS (Principal) -->
-            <div id="main-upsell" class="glass rounded-3xl p-8 md:p-12 border-2 border-amber-500/30 relative overflow-hidden mb-12">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
-                
-                <div class="relative z-10">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30">
-                            <span class="text-xs font-black uppercase text-amber-500">🔥 Potencialize seus resultados</span>
-                        </div>
-                    </div>
-                    
-                    <h3 class="text-3xl md:text-5xl font-black uppercase mb-4">
-                        Turbine Seu <span class="text-amber-500">Desempenho</span>
-                    </h3>
-                    
-                    <p class="text-zinc-400 text-lg mb-8 max-w-2xl">
-                        Descubra o método complementar que já transformou a vida de <strong class="text-white">milhares de homens</strong> em todo Brasil.
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                            <div>
-                                <div class="font-bold text-white mb-1">Mais Energia</div>
-                                <div class="text-sm text-zinc-500">Disposição o dia todo</div>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                            </svg>
-                            <div>
-                                <div class="font-bold text-white mb-1">Foco Mental</div>
-                                <div class="text-sm text-zinc-500">Concentração máxima</div>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <svg class="w-6 h-6 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <div>
-                                <div class="font-bold text-white mb-1">100% Natural</div>
-                                <div class="text-sm text-zinc-500">Sem efeitos colaterais</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row items-center gap-4">
-                        <a href="https://app.monetizze.com.br/r/AGS25730634" target="_blank" class="w-full sm:w-auto px-8 py-4 bg-amber-500 text-black font-black uppercase text-sm rounded-xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-900/50 text-center pulse-slow">
-                            Descobrir o Método Completo
-                        </a>
-                        <div class="flex items-center gap-2 text-zinc-500 text-xs">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                            <span>Oferta exclusiva para membros Alpha</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- WELCOME -->
+    <section>
+      <p class="welcome-eyebrow">Seu acesso está liberado</p>
+      <h1 class="welcome-title">Bem-vindo ao <em>Alpha.</em></h1>
+      <p class="welcome-sub">Tudo que você precisa está aqui embaixo. Comece pelo programa principal e acesse os bônus no seu ritmo.</p>
     </section>
 
-    <!-- UPSELL #2: SIDEBAR FIXO -->
-    <div id="sidebar-upsell" class="sidebar-sticky hidden lg:block">
-        <div class="glass rounded-2xl p-6 w-64 border-2 border-purple-500/30">
-            <div class="text-center">
-                <div class="text-3xl mb-3">💪</div>
-                <div class="text-sm font-black uppercase text-purple-400 mb-2">Oferta Exclusiva</div>
-                <div class="text-lg font-bold mb-3">Aumente Sua Testosterona</div>
-                <div class="text-xs text-zinc-400 mb-4">Método natural comprovado</div>
-                <a href="https://app.monetizze.com.br/r/AGS25730634" target="_blank" class="block w-full py-3 bg-purple-500 text-white font-bold text-xs uppercase rounded-lg hover:bg-purple-600 transition-all">
-                    Ver Mais
-                </a>
-            </div>
+    <!-- STATS -->
+    <section>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-pct" style="color:var(--red);">0%</div>
+          <div class="stat-label">Conclusão</div>
         </div>
-    </div>
-
-    <!-- UPSELL #5: COUNTDOWN TIMER -->
-    <div id="countdown-upsell" class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-red-500/30 p-4 hidden">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="text-2xl">⏰</div>
-                <div>
-                    <div class="text-sm font-black uppercase text-red-500">Oferta Expira em:</div>
-                    <div class="text-2xl font-black" id="countdown-timer">23:59:59</div>
-                </div>
-            </div>
-            <div class="text-center md:text-left">
-                <div class="text-sm font-bold mb-1">Melhore Sua Próstata + Performance</div>
-                <div class="text-xs text-zinc-500">Desconto exclusivo termina hoje</div>
-            </div>
-            <div class="flex gap-3">
-                <a href="https://app.monetizze.com.br/r/AGS25730634" target="_blank" class="px-6 py-3 bg-red-500 text-white font-black text-xs uppercase rounded-lg hover:bg-red-600 transition-all">
-                    Garantir Desconto
-                </a>
-                <button onclick="closeCountdown()" class="px-4 py-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-modules">0/6</div>
+          <div class="stat-label">Bônus vistos</div>
         </div>
-    </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-streak" style="color:#22c55e;">0</div>
+          <div class="stat-label">Dias seguidos</div>
+        </div>
+      </div>
+    </section>
 
-    <!-- UPSELL #1: MODAL COMPLETION (Hidden by default) -->
-    <div id="completion-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeCompletionModal()"></div>
-        <div class="modal-content relative glass rounded-3xl p-8 max-w-md w-full border-2 border-green-500/30">
-            <button onclick="closeCompletionModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <!-- HERO PDF -->
+    <section>
+      <p class="sec-label">Programa principal</p>
+      <div class="pdf-hero">
+        <div class="pdf-hero-accent"></div>
+        <div class="pdf-hero-inner">
+
+          <!-- PDF visual -->
+          <div class="pdf-icon-wrap">
+            <span class="pdf-icon-text">PDF</span>
+            <div class="pdf-icon-lines">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <!-- PDF info -->
+          <div class="pdf-info">
+            <div class="pdf-badge-wrap">
+              <span class="pdf-badge-main">⚡ Principal</span>
+              <span class="pdf-badge-format">PDF · Download</span>
+            </div>
+            <h2 class="pdf-title">P-Alpha — Dr. Kegel</h2>
+            <p class="pdf-desc">
+              O protocolo completo de treinamento de Kegel masculino. Abra no celular ou imprima — é seu guia de referência para todo o programa.
+            </p>
+            <a
+              href="https://fiapy.nyc3.cdn.digitaloceanspaces.com/static/689cd4c1fb343f925c982272/7f69ca483c9f32443cdc_-_palpha_dr_kegel.pdf"
+              target="_blank"
+              rel="noopener"
+              class="pdf-btn"
+              onclick="trackPDF()"
+            >
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Abrir e baixar PDF
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BONUS MODULES -->
+    <section>
+      <p class="sec-label">Seus bônus — acesse quando quiser</p>
+      <div class="bonus-grid" id="bonus-grid">
+        <!-- rendered by JS -->
+      </div>
+    </section>
+
+    <!-- UPSELL CARD (single, non-intrusive) -->
+    <section>
+      <div class="upsell-card">
+        <div class="upsell-card-top"></div>
+        <div class="upsell-inner">
+          <div class="upsell-text">
+            <p class="upsell-eyebrow">🔥 Para membros Alpha</p>
+            <h3 class="upsell-title">Proteja sua próstata e multiplique seus resultados</h3>
+            <p class="upsell-desc">37 receitas práticas que ativam o fluxo sanguíneo, regulam a testosterona e blindam sua saúde masculina — para o P-Alpha trabalhar no nível máximo.</p>
+          </div>
+          <a href="https://app.monetizze.com.br/r/AGS25730634" target="_blank" class="upsell-cta">
+            Ver oferta exclusiva →
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPLETION BANNER (shown when all modules done) -->
+    <section id="complete-section" style="display:none;">
+      <div class="complete-banner">
+        <div class="complete-banner-icon">🏆</div>
+        <div>
+          <p class="complete-banner-title">Você completou todos os bônus!</p>
+          <p class="complete-banner-text">Continue praticando o protocolo do PDF — consistência é o que separa resultado de intenção.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Module complete modal -->
+  <div class="modal-wrap" id="complete-modal">
+    <div class="modal-box">
+      <div class="modal-emoji">✅</div>
+      <h3 class="modal-title">Bônus concluído!</h3>
+      <p class="modal-text">Bom trabalho. Continue aplicando o protocolo — a consistência é o que gera resultado.</p>
+      <button class="modal-close" onclick="closeModal()">Continuar</button>
+    </div>
+  </div>
+
+  <script>
+    const MODULES = [
+      { id: 1, icon: '🎥', title: 'Arsenal de Vídeos',     desc: 'Protocolos visuais com técnicas avançadas passo a passo.',       link: 'https://drive.google.com/drive/folders/1-uUf4Xg0vCA-wNzzeVW_eOXoQhYUcMt9?usp=sharing' },
+      { id: 2, icon: '📄', title: 'Manual de Campo PDF',   desc: 'Guia definitivo para consulta rápida durante o treino.',          link: 'https://drive.google.com/drive/folders/1ymcN1xAcPsft97--zPADOj0K57CKl7uh?usp=drive_link' },
+      { id: 3, icon: '🔥', title: 'Guia do Comedor',       desc: 'Dominância e sedução — mentalidade e técnica.',                   link: 'https://drive.google.com/drive/folders/1LDpbaL-DfR9_-t0XLviWc7A8VwD36-H1?usp=drive_link' },
+      { id: 4, icon: '⚡', title: 'Deixe de Ser Precoce',  desc: 'Controle total do sistema nervoso e do tempo.',                   link: 'https://drive.google.com/drive/folders/1ZitQW6kzfxdEtAUTbX0R2NVD87R_gi_9?usp=drive_link' },
+      { id: 5, icon: '🔑', title: 'Código do Orgasmo',     desc: 'Fisiologia do prazer feminino — o que os outros não ensinam.',    link: 'https://drive.google.com/drive/folders/1h_zkRqIyizL0oAm3DGLgTVLvNKgCj3JL?usp=drive_link' },
+      { id: 6, icon: '🧪', title: 'Azulzinho Caseiro',     desc: 'Biohacking natural — sem remédios, sem efeitos colaterais.',      link: 'https://drive.google.com/drive/folders/1LsRq51aoROS_nTq-vr6duH_xKAgB3KMZ?usp=drive_link' },
+    ];
+
+    const PROG_KEY   = 'palpha_prog_v2';
+    const STREAK_KEY = 'palpha_streak_v2';
+    const ACCESS_KEY = 'palpha_access_v2';
+
+    let progress = JSON.parse(localStorage.getItem(PROG_KEY) || '{}');
+
+    /* ── INIT ── */
+    MODULES.forEach(m => { if (!progress[m.id]) progress[m.id] = { done: false, count: 0 }; });
+    saveAndRender();
+    updateStreak();
+
+    /* ── RENDER ── */
+    function saveAndRender() {
+      localStorage.setItem(PROG_KEY, JSON.stringify(progress));
+      renderGrid();
+      updateStats();
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('bonus-grid');
+      grid.innerHTML = MODULES.map(m => {
+        const p = progress[m.id];
+        return `
+          <div class="bonus-card">
+            <div class="bonus-card-top">
+              <span class="bonus-icon">${m.icon}</span>
+              <span class="bonus-count-badge">${p.count} acesso${p.count !== 1 ? 's' : ''}</span>
+            </div>
+            <div>
+              <p class="bonus-title">${p.done ? '<span style="color:#22c55e;margin-right:6px;">✓</span>' : ''}${m.title}</p>
+              <p class="bonus-desc">${m.desc}</p>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <a href="${m.link}" target="_blank" rel="noopener"
+                 class="bonus-btn" style="flex:1;"
+                 onclick="trackAccess(${m.id})">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
-            </button>
-            
-            <div class="text-center">
-                <div class="text-6xl mb-4">🎉</div>
-                <h3 class="text-2xl font-black uppercase mb-3">Parabéns!</h3>
-                <p class="text-zinc-400 mb-6">Você completou um módulo! Continue assim para alcançar resultados extraordinários.</p>
-                
-                <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-6">
-                    <div class="text-sm font-bold text-green-400 mb-2">🚀 Acelere seus resultados</div>
-                    <div class="text-xs text-zinc-400 mb-3">Aumente sua energia e foco com o método complementar</div>
-                    <a href="https://app.monetizze.com.br/r/AGS25730634" target="_blank" class="block w-full py-3 bg-green-500 text-black font-black text-xs uppercase rounded-lg hover:bg-green-600 transition-all">
-                        Ver Oferta Especial
-                    </a>
-                </div>
-                
-                <button onclick="closeCompletionModal()" class="text-xs text-zinc-500 hover:text-white transition-colors">Não, obrigado</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- UPSELL #3: EXIT INTENT MODAL (Hidden by default) -->
-    <div id="exit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeExitModal()"></div>
-        <div class="modal-content relative glass rounded-3xl p-8 max-w-lg w-full border-2 border-blue-500/30">
-            <button onclick="closeExitModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                Acessar
+              </a>
+              ${!p.done ? `
+              <button class="bonus-btn" onclick="markDone(${m.id})" style="padding:9px 14px;">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                 </svg>
-            </button>
-            
-            <div class="text-center">
-                <div class="text-6xl mb-4">⚠️</div>
-                <h3 class="text-3xl font-black uppercase mb-3">Espere!</h3>
-                <p class="text-zinc-400 mb-6">Antes de sair, dê uma olhada nesta oferta <strong class="text-white">EXCLUSIVA</strong> para membros Alpha...</p>
-                
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-                        <div class="text-2xl mb-2">🧠</div>
-                        <div class="text-sm font-bold">Clareza Mental</div>
-                    </div>
-                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-                        <div class="text-2xl mb-2">💊</div>
-                        <div class="text-sm font-bold">Saúde Próstata</div>
-                    </div>
-                </div>
-                
-                <a href="https://app.monetizze.com.br/r/AGS25730634" target="_blank" class="block w-full py-4 bg-blue-500 text-white font-black text-sm uppercase rounded-xl hover:bg-blue-600 transition-all mb-3">
-                    Ver Oferta Exclusiva
-                </a>
-                
-                <button onclick="closeExitModal()" class="text-xs text-zinc-500 hover:text-white transition-colors">Não, prefiro sair</button>
+              </button>` : ''}
             </div>
-        </div>
-    </div>
+          </div>
+        `;
+      }).join('');
+    }
 
-    <!-- Notifications Container -->
-    <div id="notifications" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm"></div>
+    function updateStats() {
+      const done  = Object.values(progress).filter(p => p.done).length;
+      const total = MODULES.length;
+      const pct   = Math.round((done / total) * 100);
+      document.getElementById('stat-pct').textContent      = pct + '%';
+      document.getElementById('stat-modules').textContent  = `${done}/${total}`;
+      document.getElementById('complete-section').style.display = done === total ? '' : 'none';
+    }
 
-    <script>
-        const MODULES = [
-            {
-                id: 1,
-                title: 'Arsenal de Vídeos',
-                description: 'Protocolos visuais completos com técnicas avançadas',
-                icon: '🎥',
-                link: 'https://drive.google.com/drive/folders/1-uUf4Xg0vCA-wNzzeVW_eOXoQhYUcMt9?usp=sharing',
-                color: 'red'
-            },
-            {
-                id: 2,
-                title: 'Manual de Campo PDF',
-                description: 'Guia definitivo para consulta rápida e aplicação',
-                icon: '📄',
-                link: 'https://drive.google.com/drive/folders/1ymcN1xAcPsft97--zPADOj0K57CKl7uh?usp=drive_link',
-                color: 'blue'
-            },
-            {
-                id: 3,
-                title: 'Guia do Comedor',
-                description: 'Domine a arte da sedução e conquiste qualquer mulher',
-                icon: '🔥',
-                link: 'https://drive.google.com/drive/folders/1LDpbaL-DfR9_-t0XLviWc7A8VwD36-H1?usp=drive_link',
-                color: 'green'
-            },
-            {
-                id: 4,
-                title: 'Deixe de Ser Precoce',
-                description: 'Controle total do seu sistema nervoso',
-                icon: '⚡',
-                link: 'https://drive.google.com/drive/folders/1ZitQW6kzfxdEtAUTbX0R2NVD87R_gi_9?usp=drive_link',
-                color: 'purple'
-            },
-            {
-                id: 5,
-                title: 'Código do Orgasmo',
-                description: 'Domine a fisiologia do prazer feminino',
-                icon: '🔑',
-                link: 'https://drive.google.com/drive/folders/1h_zkRqIyizL0oAm3DGLgTVLvNKgCj3JL?usp=drive_link',
-                color: 'pink'
-            },
-            {
-                id: 6,
-                title: 'Azulzinho Caseiro',
-                description: 'Biohacking natural sem efeitos colaterais',
-                icon: '🧪',
-                link: 'https://drive.google.com/drive/folders/1LsRq51aoROS_nTq-vr6duH_xKAgB3KMZ?usp=drive_link',
-                color: 'amber'
-            }
-        ];
+    function trackAccess(id) {
+      progress[id].count++;
+      saveAndRender();
+    }
 
-        const PROGRESS_KEY = 'alpha_progress';
-        const STREAK_KEY = 'alpha_streak';
-        
-        let progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
-        let lastAccess = localStorage.getItem('last_access') || null;
-        let exitIntentShown = localStorage.getItem('exit_intent_shown') === 'true';
-        
-        function initProgress() {
-            MODULES.forEach(m => {
-                if (!progress[m.id]) {
-                    progress[m.id] = { completed: false, lastAccess: null, count: 0 };
-                }
-            });
-            saveProgress();
-        }
+    function trackPDF() {
+      showToast('📄', 'PDF aberto', 'Seu programa principal está carregando.');
+    }
 
-        function saveProgress() {
-            localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
-            updateStats();
-        }
+    function markDone(id) {
+      progress[id].done = true;
+      saveAndRender();
+      document.getElementById('complete-modal').classList.add('open');
+    }
 
-        function markComplete(id) {
-            progress[id].completed = true;
-            progress[id].lastAccess = Date.now();
-            progress[id].count++;
-            saveProgress();
-            renderModules();
-            
-            // UPSELL #1: Show completion modal
-            showCompletionModal();
-        }
+    function closeModal() {
+      document.getElementById('complete-modal').classList.remove('open');
+    }
 
-        function updateStats() {
-            const completed = Object.values(progress).filter(p => p.completed).length;
-            const total = MODULES.length;
-            const percentage = Math.round((completed / total) * 100);
-            
-            document.getElementById('completion-percent').textContent = percentage + '%';
-            document.getElementById('modules-completed').textContent = `${completed}/${total}`;
-            
-            const today = new Date().toDateString();
-            if (lastAccess !== today) {
-                const yesterday = new Date(Date.now() - 86400000).toDateString();
-                let streak = parseInt(localStorage.getItem(STREAK_KEY) || '0');
-                
-                if (lastAccess === yesterday) {
-                    streak++;
-                } else if (lastAccess !== today) {
-                    streak = 1;
-                }
-                
-                localStorage.setItem(STREAK_KEY, streak.toString());
-                localStorage.setItem('last_access', today);
-            }
-            
-            document.getElementById('streak-days').textContent = localStorage.getItem(STREAK_KEY) || '0';
-            
-            let medals = 0;
-            if (completed >= 3) medals++;
-            if (completed === total) medals++;
-            if (parseInt(localStorage.getItem(STREAK_KEY) || '0') >= 7) medals++;
-            document.getElementById('total-medals').textContent = medals;
-        }
+    /* ── STREAK ── */
+    function updateStreak() {
+      const today = new Date().toDateString();
+      const last  = localStorage.getItem(ACCESS_KEY);
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+      let streak = parseInt(localStorage.getItem(STREAK_KEY) || '0');
 
-        function renderModules() {
-            const grid = document.getElementById('modules-grid');
-            grid.innerHTML = MODULES.map(m => {
-                const p = progress[m.id];
-                const colorClasses = {
-                    red: 'border-red-500/30 hover:border-red-500/50',
-                    blue: 'border-blue-500/30 hover:border-blue-500/50',
-                    green: 'border-green-500/30 hover:border-green-500/50',
-                    purple: 'border-purple-500/30 hover:border-purple-500/50',
-                    pink: 'border-pink-500/30 hover:border-pink-500/50',
-                    amber: 'border-amber-500/30 hover:border-amber-500/50'
-                };
-                
-                return `
-                    <div class="glass rounded-2xl p-6 ${colorClasses[m.color]} border-2 transition-all hover:scale-[1.02] group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="text-4xl">${m.icon}</div>
-                            <div class="flex flex-col items-end gap-2">
-                                ${p.completed ? '<div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>' : ''}
-                                <div class="text-xs text-zinc-500">${p.count} acessos</div>
-                            </div>
-                        </div>
-                        
-                        <h3 class="text-lg font-bold mb-2">${m.title}</h3>
-                        <p class="text-sm text-zinc-400 mb-4">${m.description}</p>
-                        
-                        <div class="flex gap-2">
-                            <a href="${m.link}" target="_blank" onclick="trackAccess(${m.id})" class="flex-1 py-2.5 px-4 bg-white/5 border border-white/10 rounded-lg font-bold text-sm uppercase hover:bg-white/10 transition-all text-center">
-                                Acessar
-                            </a>
-                            ${!p.completed ? `<button onclick="markComplete(${m.id})" class="py-2.5 px-4 bg-green-500 rounded-lg font-bold text-sm uppercase hover:bg-green-600 transition-all text-black">Concluir</button>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+      if (last !== today) {
+        streak = last === yesterday ? streak + 1 : 1;
+        localStorage.setItem(STREAK_KEY, String(streak));
+        localStorage.setItem(ACCESS_KEY, today);
+      }
+      document.getElementById('stat-streak').textContent = streak;
+    }
 
-        function trackAccess(id) {
-            progress[id].count++;
-            progress[id].lastAccess = Date.now();
-            saveProgress();
-        }
+    /* ── TOASTS ── */
+    function showToast(icon, title, body) {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-text"><b>${title}</b><br>${body}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 4000);
+    }
 
-        function resetProgress() {
-            if (confirm('Tem certeza que deseja resetar todo o progresso?')) {
-                localStorage.removeItem(PROGRESS_KEY);
-                localStorage.removeItem(STREAK_KEY);
-                localStorage.removeItem('last_access');
-                progress = {};
-                initProgress();
-                renderModules();
-                showNotification('🔄 Progresso resetado!');
-            }
-        }
+    /* subtle random activity toasts — only on desktop, low frequency */
+    const names = ['Carlos', 'Ricardo', 'Felipe', 'Marcos', 'André'];
+    setInterval(() => {
+      if (Math.random() > .65 && window.innerWidth > 640) {
+        const n = names[Math.floor(Math.random() * names.length)];
+        showToast('👤', n + ' entrou agora', 'Acabou de acessar a área de membros.');
+      }
+    }, 20000);
+  </script>
 
-        function showNotification(message) {
-            const container = document.getElementById('notifications');
-            const id = Date.now();
-            const notification = document.createElement('div');
-            notification.id = `notif-${id}`;
-            notification.className = 'glass rounded-xl p-4 border border-white/10 notification-enter shadow-xl';
-            notification.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="text-xl">${message.charAt(0)}</div>
-                    <div class="flex-1 text-sm font-bold">${message.slice(2)}</div>
-                </div>
-            `;
-            container.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('notification-exit');
-                setTimeout(() => notification.remove(), 400);
-            }, 4000);
-        }
-
-        // UPSELL #1: Completion Modal
-        function showCompletionModal() {
-            document.getElementById('completion-modal').classList.remove('hidden');
-        }
-
-        function closeCompletionModal() {
-            document.getElementById('completion-modal').classList.add('hidden');
-        }
-
-        // UPSELL #3: Exit Intent Modal
-        let exitIntentTriggered = false;
-        document.addEventListener('mouseleave', function(e) {
-            if (e.clientY < 10 && !exitIntentTriggered && !exitIntentShown) {
-                exitIntentTriggered = true;
-                document.getElementById('exit-modal').classList.remove('hidden');
-                localStorage.setItem('exit_intent_shown', 'true');
-            }
-        });
-
-        function closeExitModal() {
-            document.getElementById('exit-modal').classList.add('hidden');
-        }
-
-        // UPSELL #5: Countdown Timer
-        let countdownSeconds = 86399; // 23:59:59
-        function startCountdown() {
-            setInterval(() => {
-                countdownSeconds--;
-                const hours = Math.floor(countdownSeconds / 3600);
-                const minutes = Math.floor((countdownSeconds % 3600) / 60);
-                const seconds = countdownSeconds % 60;
-                document.getElementById('countdown-timer').textContent = 
-                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function closeCountdown() {
-            document.getElementById('countdown-upsell').classList.add('hidden');
-        }
-
-        // Show countdown after 30 seconds
-        setTimeout(() => {
-            document.getElementById('countdown-upsell').classList.remove('hidden');
-            startCountdown();
-        }, 30000);
-
-        // Random activity notifications
-        const names = ['Carlos', 'Ricardo', 'Felipe', 'André', 'Marcos', 'Lucas', 'Bruno'];
-        const activities = [
-            'acabou de completar um módulo',
-            'está assistindo o Arsenal de Vídeos',
-            'completou o Guia do Comedor',
-            'desbloqueou uma nova conquista'
-        ];
-
-        function showRandomActivity() {
-            if (Math.random() > 0.7) {
-                const name = names[Math.floor(Math.random() * names.length)];
-                const activity = activities[Math.floor(Math.random() * activities.length)];
-                showNotification(`👤 ${name} ${activity}`);
-            }
-        }
-
-        setInterval(showRandomActivity, 15000);
-
-        // Initialize
-        initProgress();
-        renderModules();
-        updateStats();
-    </script>
 </body>
 </html>
